@@ -2,17 +2,12 @@
 
 Summary:	Power manager for XFCE desktop
 Name:		xfce4-power-manager
-Version:	1.2.0
-Release:	2
+Version:	1.4.1
+Release:	1
 License:	GPL v2
 Group:		X11/Applications
-Source0:	http://archive.xfce.org/src/apps/xfce4-power-manager/1.2/%{name}-%{version}.tar.bz2
-# Source0-md5:	935599b7114b0a4b0e2c9a5d6c72524c
-Patch0:		0001-Add-systemd-logind-support-for-suspend-hibernate.patch
-Patch1:		0001-Don-t-allow-systemd-to-handle-suspend-hibernate-even.patch
-Patch2:		5ac47c842bb53ba7ae9240ccd2af7c93fe7eecaf.patch
-Patch3:		alt-2043f17a7a5d7b053e7f82ca6fdeea8bd943a456.patch
-Patch4:		alt-bd320170fe05acdc61560617b2c86ea46806aa33.patch
+Source0:	http://archive.xfce.org/src/apps/xfce4-power-manager/1.4/%{name}-%{version}.tar.bz2
+# Source0-md5:	808a2630487d75e6eae915e464b7fda3
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	intltool
@@ -41,13 +36,6 @@ Power manager applets for Xfce panel.
 
 %prep
 %setup -qn %{name}-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p2
-%patch4 -p2
-
-%{__sed} -i "s|AM_CONFIG_HEADER|AC_CONFIG_HEADERS|" configure.ac
 
 %build
 export CONFIG_SHELL=/bin/bash
@@ -59,8 +47,7 @@ export CONFIG_SHELL=/bin/bash
 %{__automake}
 bash %configure \
 	--disable-static	\
-	--disable-silent-rules	\
-	--with-sleep-manager=systemd
+	--disable-silent-rules
 %{__make}
 
 %install
@@ -70,7 +57,8 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT \
 	docdir="%{_datadir}/xfce4/help/%{name}"
 
-rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/ur_PK
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/locale/ur_PK
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/xfce4/panel/plugins/*.la
 
 %find_lang %{name}
 
@@ -87,8 +75,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README TODO
 %attr(755,root,root) %{_bindir}/xfce4-power-manager
-%attr(755,root,root) %{_bindir}/xfce4-power-information
 %attr(755,root,root) %{_bindir}/xfce4-power-manager-settings
+%attr(755,root,root) %{_sbindir}/xfce4-pm-helper
 %attr(755,root,root) %{_sbindir}/xfpm-power-backlight-helper
 %{_datadir}/polkit-1/actions/org.xfce.power.policy
 /etc/xdg/autostart/xfce4-power-manager.desktop
@@ -98,6 +86,5 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n xfce4-plugin-power-manager
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/xfce4/panel-plugins/xfce4-brightness-plugin
-%{_datadir}/xfce4/panel-plugins/xfce4-brightness-plugin.desktop
-
+%attr(755,root,root) %{_libdir}/xfce4/panel/plugins/libxfce4powermanager.so
+%{_datadir}/xfce4/panel/plugins/power-manager-plugin.desktop
